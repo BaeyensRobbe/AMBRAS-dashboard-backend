@@ -13,6 +13,8 @@ app.use(express.json());
 app.use("/passwords", require("./routes/passwordRoutes").default);
 app.use("/tasks", require("./routes/taskRouter").default);
 app.use("/events", require("./routes/eventsRouter").default);
+app.use("/vault", require("./routes/vaultRouter").default);
+
 
 app.get("/", (req, res) => {
   res.send("AMBRAS Backend is running!");
