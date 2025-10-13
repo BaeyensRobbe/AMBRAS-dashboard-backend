@@ -15,9 +15,16 @@ export const getItems = async (req: Request, res: Response) => {
 export const addItem = async (req: Request, res: Response) => {
   try {
     const item = req.body;
-    const encryptedPassword = encrypt(item.password);
-    const newItem = await vaultModel.addItem({ ...item, password: encryptedPassword });
-    res.status(201).json(newItem);
+    if (item.password) {
+
+      const encryptedPassword = encrypt(item.password);
+      const newItem = await vaultModel.addItem({ ...item, password: encryptedPassword });
+      res.status(201).json(newItem);
+      return;
+    } else {
+      const newItem = await vaultModel.addItem(item);
+      res.status(201).json(newItem);
+    }
   } catch (error) {
     console.error("Error adding vault item:", error);
     res.status(500).json({ error: "Internal server error" });
