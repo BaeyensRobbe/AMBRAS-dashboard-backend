@@ -1,7 +1,7 @@
 import { pool } from "../db/index";
 import { VaultItem } from "../types/vaultTypes"; // or same file
 
-export const createItem = async (item: VaultItem) => {
+export const addItem = async (item: VaultItem) => {
   const { type, title, content, username, password, url, image_url } = item;
   const res = await pool.query(
     `INSERT INTO vault_items

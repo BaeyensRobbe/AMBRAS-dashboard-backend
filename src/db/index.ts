@@ -3,10 +3,23 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+// ✅ Tell TypeScript that globalThis has pgPool
+declare global {
+  // eslint-disable-next-line no-var
+  var pgPool: Pool | undefined;
+}
 
-pool.on("connect", () => {
-  console.log("Connected to PostgreSQL database");
-}); 
+let pool: Pool;
+
+if (!globalThis.pgPool) {
+  globalThis.pgPool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false } // required for Neon
+  });
+
+  globalThis.pgPool.on("connect", () => console.log("Connected to Neon DB"));
+}
+
+pool = globalThis.pgPool;
+
+export { pool };
