@@ -3,18 +3,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-let pool: Pool;
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-if (!globalThis.pgPool) {
-  globalThis.pgPool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
-
-  globalThis.pgPool.on("connect", () => {
-    console.log("Connected to Neon DB");
-  });
-}
-
-pool = globalThis.pgPool;
-
-export { pool };
+pool.on("connect", () => {
+  console.log("Connected to PostgreSQL database");
+}); 

@@ -1,7 +1,8 @@
 const vaultModel = require("../models/vaultModal");
-const { encrypt, decrypt } = require("../utils/crypto");
+const { encrypt, decrypt } = require("../utils/encryption");
+import { Request, Response } from "express";
 
-export const getItems = async (req, res) => {
+export const getItems = async (req: Request, res: Response) => {
   try {
     const items = await vaultModel.getAllItems();
     res.json(items);
@@ -11,7 +12,7 @@ export const getItems = async (req, res) => {
   }
 }
 
-export const addItem = async (req, res) => {
+export const addItem = async (req: Request, res: Response) => {
   try {
     const item = req.body;
     const encryptedPassword = encrypt(item.password);
@@ -23,7 +24,7 @@ export const addItem = async (req, res) => {
   }
 }
 
-export const updateItem = async (req, res) => {
+export const updateItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const item = req.body;
@@ -36,7 +37,7 @@ export const updateItem = async (req, res) => {
   }
 }
 
-export const deleteItem = async (req, res) => {
+export const deleteItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     await vaultModel.deleteItem(id);
@@ -47,7 +48,7 @@ export const deleteItem = async (req, res) => {
   }
 }
 
-export const decryptPassword = async (req, res) => {
+export const decryptPassword = async (req: Request, res: Response) => {
   try {
     const item = await vaultModel.getItemById(req.params.id);
     if (!item) return res.status(404).json({ error: "Item not found" });

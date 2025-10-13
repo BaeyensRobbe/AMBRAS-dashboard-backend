@@ -2,6 +2,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import vaultRouter from "./routes/vaultRouter";
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ app.use(express.json());
 app.use("/passwords", require("./routes/passwordRoutes").default);
 app.use("/tasks", require("./routes/taskRouter").default);
 app.use("/events", require("./routes/eventsRouter").default);
-app.use("/vault", require("./routes/vaultRouter").default);
+app.use("/vault", vaultRouter);
 
 
 app.get("/", (req, res) => {
