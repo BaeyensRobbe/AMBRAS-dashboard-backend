@@ -6,10 +6,21 @@ export const getPasswords = async (req: Request, res: Response) => {
   try {
     const passwords = await PasswordModal.getPasswords();
 
-    const decryptedRows = passwords.map((row) => ({
-      ...row,
-      password: decrypt(row.password),
-    }));
+    const decryptedRows = passwords.map((row) => {
+      let decryptedPassword: string;
+
+      try {
+        decryptedPassword = decrypt(row.password);
+      } catch (err) {
+        console.error("Failed to decrypt password for row:", row.id, err);
+        decryptedPassword = "[decryption failed]";
+      }
+
+      return {
+        ...row,
+        password: decryptedPassword,
+      };
+    });
 
     res.json(decryptedRows);
   } catch (error) {
@@ -17,6 +28,7 @@ export const getPasswords = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 export const addPassword = async (req: Request, res: Response) => {
   try {

@@ -16,15 +16,27 @@ export function encrypt(text: string): string {
 }
 
 export function decrypt(payload: string): string {
-  const [ivHex, tagHex, encryptedHex] = payload.split(":");
-  if (!ivHex || !tagHex || !encryptedHex) throw new Error("Invalid payload");
+  try {
+    if (!payload) return ""; // empty or null value
 
-  const iv = Buffer.from(ivHex, "hex");
-  const tag = Buffer.from(tagHex, "hex");
-  const encrypted = Buffer.from(encryptedHex, "hex");
+    const parts = payload.split(":");
+    if (parts.length !== 3) {
+      console.warn("Skipping decryption, invalid payload format:", payload);
+      return payload; // return as-is if not in expected format
+    }
 
-  const decipher = crypto.createDecipheriv(ALGO, KEY, iv);
-  decipher.setAuthTag(tag);
-  const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
-  return decrypted.toString("utf8");
+    const [ivHex, tagHex, encryptedHex] = parts;
+    const iv = Buffer.from(ivHex, "hex");
+    const tag = Buffer.from(tagHex, "hex");
+    const encrypted = Buffer.from(encryptedHex, "hex");
+
+    const decipher = crypto.createDecipheriv(ALGO, KEY, iv);
+    decipher.setAuthTag(tag);
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return decrypted.toString("utf8");
+  } catch (err) {
+    console.error("Decryption failed:", err, payload);
+    return payload; // fallback: return original string
+  }
 }
+
