@@ -1,9 +1,9 @@
-const vaultModel = require("../models/vaultModel");
+const vaultModel = require("../models/vaultModal");
 const { encrypt, decrypt } = require("../utils/crypto");
 
 export const getItems = async (req, res) => {
   try {
-    const items = await vaultModel.getItems();
+    const items = await vaultModel.getAllItems();
     res.json(items);
   } catch (error) {
     console.error("Error fetching vault items:", error);
