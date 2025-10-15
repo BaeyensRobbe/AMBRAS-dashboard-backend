@@ -35,9 +35,16 @@ export const updateItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const item = req.body;
-    const encryptedPassword = encrypt(item.password);
-    const updatedItem = await vaultModel.updateItem(id, { ...item, password: encryptedPassword });
-    res.json(updatedItem);
+    if (item.type === "password") {
+      const encryptedPassword = encrypt(item.password);
+      const updatedItem = await vaultModel.updateItem(id, { ...item, password: encryptedPassword });
+      res.json(updatedItem);
+      return;
+    } else {
+      const updatedItem = await vaultModel.updateItem(id, item);
+      res.json(updatedItem);
+      return;
+    }
   } catch (error) {
     console.error("Error updating vault item:", error);
     res.status(500).json({ error: "Internal server error" });
