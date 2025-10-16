@@ -40,6 +40,22 @@ export const getEvents = async (req: Request, res: Response) => {
   }
 };
 
+export const getNextEvent = async (req: Request, res: Response) => {
+  try {
+    const response = await calendar.events.list({
+      calendarId,
+      timeMin: new Date().toISOString(),
+      maxResults: 1,
+      singleEvents: true,
+      orderBy: "startTime",
+    });
+    res.json(response.data.items);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+}
+
 export const createOrUpdateEvent = async (req: Request, res: Response) => {
   try {
     const { id, title, start, end, allDay, location } = req.body;
