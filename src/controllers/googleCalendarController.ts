@@ -62,3 +62,19 @@ export const createOrUpdateEvent = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getNextEvent = async (req: Request, res: Response) => {
+  try {
+    const response = await calendar.events.list({
+      calendarId,
+      timeMin: new Date().toISOString(),
+      maxResults: 1,
+      singleEvents: true,
+      orderBy: "startTime",
+    });
+    res.json(response.data.items ? response.data.items[0] : null);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
