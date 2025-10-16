@@ -2,12 +2,8 @@ import { Request, Response } from "express";
 import { google } from "googleapis";
 
 let serviceAccount: any;
-console.log("GOOGLE_SERVICE_ACCOUNT_KEY_BASE64:", process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64);
 try {
-  const jsonString = Buffer.from(
-    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 || "",
-    "base64"
-  ).toString();
+  const jsonString = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 || "", "base64").toString();
   serviceAccount = JSON.parse(jsonString);
 } catch (err) {
   console.error("Failed to parse service account key:", err);
@@ -40,50 +36,25 @@ export const getEvents = async (req: Request, res: Response) => {
   }
 };
 
-export const getNextEvent = async (req: Request, res: Response) => {
-  try {
-    const response = await calendar.events.list({
-      calendarId,
-      timeMin: new Date().toISOString(),
-      maxResults: 1,
-      singleEvents: true,
-      orderBy: "startTime",
-    });
-    res.json(response.data.items);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-}
 export const createOrUpdateEvent = async (req: Request, res: Response) => {
   try {
-    const { id, title, start, end, allDay, location, color } = req.body;
+    const { id, title, start, end, allDay, location, colorId } = req.body;
 
     const eventData: any = { summary: title, location };
 
     if (allDay) {
-      eventData.start = { date: start.split("T")[0] };
-      eventData.end = { date: end.split("T")[0] };
+      eventData.start = { date: start };
+      eventData.end = { date: end }; // Google expects exclusive end date
     } else {
       eventData.start = { dateTime: start, timeZone: "Europe/Brussels" };
       eventData.end = { dateTime: end, timeZone: "Europe/Brussels" };
     }
 
-    if (color) eventData.colorId = color; // optional
+    if (colorId) eventData.colorId = colorId;
 
-    let event;
-    if (id) {
-      event = await calendar.events.update({
-        calendarId,
-        eventId: id,
-        requestBody: eventData,
-      });
-    } else {
-      event = await calendar.events.insert({
-        calendarId,
-        requestBody: eventData,
-      });
-    }
+    const event = id
+      ? await calendar.events.update({ calendarId, eventId: id, requestBody: eventData })
+      : await calendar.events.insert({ calendarId, requestBody: eventData });
 
     res.json(event.data);
   } catch (err: any) {
@@ -91,4 +62,3 @@ export const createOrUpdateEvent = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
-
