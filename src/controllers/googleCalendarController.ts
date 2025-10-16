@@ -43,12 +43,17 @@ export const createOrUpdateEvent = async (req: Request, res: Response) => {
     const eventData: any = { summary: title, location };
 
     if (allDay) {
-      eventData.start = { date: start };
-      eventData.end = { date: end }; // Google expects exclusive end date
-    } else {
-      eventData.start = { dateTime: start, timeZone: "Europe/Brussels" };
-      eventData.end = { dateTime: end, timeZone: "Europe/Brussels" };
-    }
+  const startStr = start.toISOString().split("T")[0];
+  const endStr = new Date(end.getTime() + 24*60*60*1000) // add 1 day for Google exclusive end
+    .toISOString()
+    .split("T")[0];
+
+  eventData.start = { date: startStr };
+  eventData.end = { date: endStr };
+} else {
+  eventData.start = { dateTime: start.toISOString(), timeZone: "Europe/Brussels" };
+  eventData.end = { dateTime: end.toISOString(), timeZone: "Europe/Brussels" };
+}
 
     if (colorId) eventData.colorId = colorId;
 
