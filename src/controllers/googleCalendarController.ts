@@ -1,8 +1,18 @@
 import { Request, Response } from "express";
 import { google } from "googleapis";
 
-const serviceAccountJson = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64!, 'base64').toString();
-const serviceAccount = JSON.parse(serviceAccountJson);
+let serviceAccount: any;
+console.log("GOOGLE_SERVICE_ACCOUNT_KEY_BASE64:", process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64);
+try {
+  const jsonString = Buffer.from(
+    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 || "",
+    "base64"
+  ).toString();
+  serviceAccount = JSON.parse(jsonString);
+} catch (err) {
+  console.error("Failed to parse service account key:", err);
+  throw new Error("Invalid Google service account key");
+}
 
 const calendarId = process.env.CALENDAR_ID || "ambras.parkour@gmail.com";
 
