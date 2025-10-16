@@ -15,6 +15,7 @@ app.use("/passwords", require("./routes/passwordRoutes").default);
 app.use("/tasks", require("./routes/taskRouter").default);
 app.use("/events", require("./routes/eventsRouter").default);
 app.use("/vault", vaultRouter);
+app.use("/google-calendar", require("./routes/googleCalendarRouter").default);
 
 
 app.get("/", (req, res) => {
