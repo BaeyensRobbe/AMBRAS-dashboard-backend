@@ -40,20 +40,25 @@ export const createOrUpdateEvent = async (req: Request, res: Response) => {
   try {
     const { id, title, start, end, allDay, location, colorId } = req.body;
 
+    // Convert start/end to Date objects if they are strings
+    const startDate = typeof start === "string" ? new Date(start) : start;
+    const endDate = typeof end === "string" ? new Date(end) : end;
+
     const eventData: any = { summary: title, location };
 
     if (allDay) {
-  const startStr = start.toISOString().split("T")[0];
-  const endStr = new Date(end.getTime() + 24*60*60*1000) // add 1 day for Google exclusive end
-    .toISOString()
-    .split("T")[0];
+      // all-day events: use exclusive end date
+      const startStr = startDate.toISOString().split("T")[0];
+      const endStr = new Date(endDate.getTime() + 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
 
-  eventData.start = { date: startStr };
-  eventData.end = { date: endStr };
-} else {
-  eventData.start = { dateTime: start.toISOString(), timeZone: "Europe/Brussels" };
-  eventData.end = { dateTime: end.toISOString(), timeZone: "Europe/Brussels" };
-}
+      eventData.start = { date: startStr };
+      eventData.end = { date: endStr };
+    } else {
+      eventData.start = { dateTime: startDate.toISOString(), timeZone: "Europe/Brussels" };
+      eventData.end = { dateTime: endDate.toISOString(), timeZone: "Europe/Brussels" };
+    }
 
     if (colorId) eventData.colorId = colorId;
 
@@ -67,6 +72,7 @@ export const createOrUpdateEvent = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const getNextEvent = async (req: Request, res: Response) => {
   try {
