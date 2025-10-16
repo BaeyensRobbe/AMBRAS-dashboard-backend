@@ -55,17 +55,21 @@ export const getNextEvent = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 }
-
 export const createOrUpdateEvent = async (req: Request, res: Response) => {
   try {
-    const { id, title, start, end, allDay, location } = req.body;
+    const { id, title, start, end, allDay, location, color } = req.body;
 
-    const eventData: any = {
-      summary: title,
-      start: allDay ? { date: start } : { dateTime: start },
-      end: allDay ? { date: end } : { dateTime: end },
-      location,
-    };
+    const eventData: any = { summary: title, location };
+
+    if (allDay) {
+      eventData.start = { date: start.split("T")[0] };
+      eventData.end = { date: end.split("T")[0] };
+    } else {
+      eventData.start = { dateTime: start, timeZone: "Europe/Brussels" };
+      eventData.end = { dateTime: end, timeZone: "Europe/Brussels" };
+    }
+
+    if (color) eventData.colorId = color; // optional
 
     let event;
     if (id) {
@@ -87,3 +91,4 @@ export const createOrUpdateEvent = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
